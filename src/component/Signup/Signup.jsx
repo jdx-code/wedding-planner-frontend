@@ -30,7 +30,12 @@ const Signup = () => {
           throw new Error(`Error: ${response.status} - ${response.statusText}`);
         }
         const result = await response.json();
-        // toast(result);
+        toast[result.success ? "success" : "error"](result.message, {
+          position: "bottom-center",
+          autoClose: 3000,
+          closeOnClick: true,
+          theme: "light",
+        });
         console.log(result, "result");
       } catch (error) {
         console.log(error, "error");

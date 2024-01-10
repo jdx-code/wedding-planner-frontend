@@ -6,6 +6,8 @@ import Dashboard from "../component/Dashboard/Dashboard";
 import VendorLogin from "../component/vendorLogin/VendorLogin";
 import VendorSignup from "../component/vendorSignup/VendorSignup";
 import Homepage from "../component/Homepage/Homepage";
+import DynamicVendorComp from "../component/DynamicVendorComp/DynamicVendorComp";
+import DynamicSellerComp from "../component/DynamicVendorComp/DynamicSellerComp";
 
 const Panel = () => {
   return (
@@ -16,6 +18,14 @@ const Panel = () => {
       <Route path="/vendor-login" element={<VendorLogin/>}/>
       <Route path="/vendor-signup" element={<VendorSignup/>}/>
       <Route path="/homepage" element={<Homepage/>}/>
+      <Route
+        path="/vendors/:id"
+        element={<DynamicVendorComp />}
+      />
+       <Route
+        path="/vendors/:id/:id"
+        element={<DynamicSellerComp />}
+      />
     </Routes>
   );
 };
