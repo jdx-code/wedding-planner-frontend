@@ -1,27 +1,29 @@
 import { Fragment } from "react";
-import { Disclosure, Menu, Transition } from "@headlessui/react";
+import { Disclosure, Menu, Popover, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
-  BellIcon,
-  UserIcon,
+  ChevronDownIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
+import useFetch from "../../utility/useFetch";
+import { connect } from "react-redux";
+import { mapDispatchToProps, mapStateToProps } from "../../connect/Connect";
+import { fetchUrl } from "../../constants/constants";
+import getClassnames from "../../utility/getClassnames";
 
 const navigation = [
   { name: "Dashboard", href: "#", current: true },
-  { name: "Team", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
+  { name: "Services", href: "#", current: false },
+  // { name: "Projects", href: "#", current: false },
 ];
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-const Navbar=()=>{
-  const handleLogout=()=>{
+const Navbar = (props) => {
+  const { data, error, loading } = useFetch(fetchUrl.categories);
+  const handleLogout = () => {
     sessionStorage.removeItem("token");
-  }
+  };
+  
   return (
     <Disclosure as="nav" className="bg-gray-800">
       {({ open }) => (
@@ -50,21 +52,82 @@ const Navbar=()=>{
                 </div>
                 <div className="hidden sm:ml-6 sm:block">
                   <div className="flex space-x-4">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        className={classNames(
-                          item.current
-                            ? "bg-gray-900 text-white"
-                            : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                          "rounded-md px-3 py-2 text-sm font-medium"
-                        )}
-                        aria-current={item.current ? "page" : undefined}
-                      >
-                        {item.name}
-                      </a>
-                    ))}
+                    {navigation.map((item, index) =>
+                      item.name === "Services" ? (
+                        <Popover key={index} className="relative" >
+                          {({ open,close}) => (
+                            <>
+                              <Popover.Button
+                                className={`
+                ${open ? "text-white" : "text-white/90"}
+                group inline-flex items-center rounded-md px-3 py-2 text-base font-medium hover:text-white focus:outline-none`}
+                              >
+                                <span>Vendors</span>
+                                <ChevronDownIcon
+                                  className={`${
+                                    open
+                                      ? "text-white-300"
+                                      : "text-white-300/70"
+                                  }
+                  ml-2 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80`}
+                                  aria-hidden="true"
+                                />
+                              </Popover.Button>
+                              <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-200"
+                                enterFrom="opacity-0 translate-y-1"
+                                enterTo="opacity-100 translate-y-0"
+                                leave="transition ease-in duration-150"
+                                leaveFrom="opacity-100 translate-y-0"
+                                leaveTo="opacity-0 translate-y-1"
+                              >
+                                <Popover.Panel className="absolute left-1/2 z-10 mt-3 w-screen max-w-sm -translate-x-1/2 transform px-4">
+                                  <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black/5">
+                                    <div className="relative grid gap-8 bg-white p-7 lg:grid-cols-2">
+                                      {data?.results?.map((item) => {
+                                        const replacedString = item.name.toLowerCase().replace(
+                                          / /g,
+                                          "-"
+                                        );
+                                        return (
+                                          <Link
+                                            onClick={()=>{props.handleCategory(item._id);close()}}
+                                            key={item.name}
+                                            to={"vendors"+"/"+replacedString}
+                                            className="-m-3 flex items-center rounded-lg p-2 transition duration-150 ease-in-out hover:bg-gray-50"
+                                          >
+                                            <div className="ml-4">
+                                              <p className="text-sm font-medium text-gray-900">
+                                                {item.name}
+                                              </p>
+                                            </div>
+                                          </Link>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                </Popover.Panel>
+                              </Transition>
+                            </>
+                          )}
+                        </Popover>
+                      ) : (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          className={getClassnames(
+                            item.current
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                            "rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          aria-current={item.current ? "page" : undefined}
+                        >
+                          {item.name}
+                        </a>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -115,7 +178,7 @@ const Navbar=()=>{
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(
+                            className={getClassnames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
@@ -128,7 +191,7 @@ const Navbar=()=>{
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(
+                            className={getClassnames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
@@ -141,7 +204,7 @@ const Navbar=()=>{
                         {({ active }) => (
                           <a
                             href="#"
-                            className={classNames(
+                            className={getClassnames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
@@ -165,7 +228,7 @@ const Navbar=()=>{
                   key={item.name}
                   as="a"
                   href={item.href}
-                  className={classNames(
+                  className={getClassnames(
                     item.current
                       ? "bg-gray-900 text-white"
                       : "text-gray-300 hover:bg-gray-700 hover:text-white",
@@ -182,5 +245,5 @@ const Navbar=()=>{
       )}
     </Disclosure>
   );
-}
-export default Navbar;
+};
+export default connect(mapStateToProps,mapDispatchToProps)(Navbar);

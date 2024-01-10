@@ -7,7 +7,7 @@ const Login = () => {
   const navigate=useNavigate()
   const handleLogin = (e) => {
     e.preventDefault();
-    const baseUrl = "http://localhost:5000/api/users/login-admin";
+    const baseUrl = "http://localhost:5000/api/users/login-customer";
     fetch(baseUrl, {
       method: "POST",
       headers: {
